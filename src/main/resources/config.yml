@@ -1,0 +1,19 @@
+database:
+    username: root
+    password: pass
+    database: db
+    host: 'localhost:3306'
+commands:
+    credits: true
+    pvp: false
+pvp:
+    enabled: false
+    killsTable: inncore_kills_factions
+    historyTable: inncore_kills-h_factions
+    scoreboard:
+        use: true
+        time: 200
+        delay: 6000
+        players: 10
+        update: 3600
+

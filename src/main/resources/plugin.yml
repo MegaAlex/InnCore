@@ -1,0 +1,53 @@
+name: InnCore
+version: 1.0
+main: me.megaalex.inncore.InnCore
+depend: [WorldEdit]
+commands:
+    credits:
+        description: InnCraft Credits system
+        usage: ./<command>
+# TODO: Enable this
+#    pvp:
+#        description: InnCraft show PVP scoreboard
+#        usage: ./<command>
+permissions:
+  inncraft.admin:
+    description: Gives all admin and user permissions
+    children:
+      inncraft.user: true
+      inncraft.credits.admin: true
+  inncraft.user:
+    description: Gives all user permissions
+    children:
+      inncraft.credits.user: true
+      inncraft.pvp: true
+  inncraft.credits:
+    description: Gives permission to show use the plugin
+  inncraft.credits.send:
+   description: Gives permission to send credits
+  inncraft.credits.deduct:
+    description: Gives permission to deduct player credits
+  inncraft.pvp:
+    description: Gives permission to show the pvp scoreboard
+  inncraft.credits.grant:
+    description: Gives permission to grant player credits
+  inncraft.credits.show:
+    description: Gives permission to show the balance of credits
+  inncraft.credits.help:
+    description: Gives permission to show the help
+  inncraft.credits.user:
+    description: Gives permission to credits user permissions
+    children:
+      inncraft.credits: true
+      inncraft.credits.send: true
+      inncraft.credits.show: true
+      inncraft.credits.help: true
+    default: true
+  inncraft.credits.admin:
+    description: Gives permission to credits admin permissions
+    children:
+          inncraft.credits.user: true
+          inncraft.credits.deduct: true
+          inncraft.credits.grant: true
+          inncraft.credits.set: true
+

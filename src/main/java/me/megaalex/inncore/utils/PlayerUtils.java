@@ -1,11 +1,12 @@
 package me.megaalex.inncore.utils;
 
-import me.megaalex.inncore.messages.Message;
-import me.megaalex.inncore.messages.MessageManager;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import me.megaalex.inncore.messages.Message;
+import me.megaalex.inncore.messages.MessageUtils;
 
 public class PlayerUtils {
 
@@ -25,7 +26,7 @@ public class PlayerUtils {
             return;
         }
 
-        MessageManager.sendMsg(player, type, args);
+        MessageUtils.sendMsg(player, type, args);
     }
 
     public static void sendMessage(String playerName, Message type, String... args) {
@@ -35,7 +36,15 @@ public class PlayerUtils {
             return;
         }
 
-        MessageManager.sendMsg(player, type, args);
+        MessageUtils.sendMsg(player, type, args);
+    }
+
+    public static void sendMessage(Player player, String message, String... args) {
+        message = MessageUtils.formatArgs(message, args);
+        message = MessageUtils.formatMessage(message);
+        if(player != null && player.isOnline()) {
+            player.sendMessage(message);
+        }
     }
 
     public static String getNameWithPrefix(String player) {

@@ -1,5 +1,7 @@
 package me.megaalex.inncore.utils;
 
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -7,8 +9,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-
-import java.util.Map;
 
 public class PvpUtils {
 
@@ -23,7 +23,7 @@ public class PvpUtils {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard board = manager.getNewScoreboard();
         Objective topObjective = board.registerNewObjective("topKills", "dummy");
-        topObjective.setDisplayName(ChatColor.GREEN + "Top biqchi:");
+        topObjective.setDisplayName(ChatColor.GREEN + "Nai-opasni:");
         topObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         for(Map.Entry<String, Integer> entry : topData.entrySet()) {

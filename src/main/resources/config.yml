@@ -1,19 +1,52 @@
 database:
-    username: root
-    password: pass
-    database: db
-    host: 'localhost:3306'
+  username: root
+  password: pass
+  database: db
+  host: 'localhost:3306'
+  prefix: 'factions_'
 commands:
-    credits: true
-    pvp: false
+  pvp: false
+  inn: true
+  credits: true
+  npc: true
+cmdrewrite:
+  credits: credits
+  pvp: pvp
 pvp:
+  enabled: false
+  killsTable: inncore_kills
+  historyTable: inncore_kills-h
+  scoreboard:
+    use: true
+    time: 200
+    delay: 6000
+    players: 10
+    update: 3600
+loginlog:
+  enabled: false
+  enabledAuthLog: false
+  loginTable: inncore_logins
+  authTable: inncore_authentications
+npc:
+  enabled: false
+  permittedGroups:
+  - light
+  - dark
+chat:
+  sync:
     enabled: false
-    killsTable: inncore_kills_factions
-    historyTable: inncore_kills-h_factions
-    scoreboard:
-        use: true
-        time: 200
-        delay: 6000
-        players: 10
-        update: 3600
-
+    serverName: factions
+    serverPass: 123456
+    connection:
+      server: localhost
+      port: 8756
+      password: 123456
+factionsmisc:
+  enabled: false
+  mining:
+    enabled: true
+    permission: inncraft.mining
+  disableStr2Potions: true
+  obsidian:
+    enabled: true
+    message: '&cYou can only get obsidian from the shop!'

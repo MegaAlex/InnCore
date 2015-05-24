@@ -5,6 +5,7 @@ public enum Message {
     NOPERM("&cTi nqmash permission da polzvash tazi komanda!"),
     MORE_HELP("&6Za poveche komandi napishi &5/credits help"),
     ERROR("&cVuznikna greshka pri obrabotka! Molq opitaite otnovo po-kusno!"),
+    ERRORCUSTOM("&cError: {1}"),
     NEGATIVE_ARG("&cMolq izpolzvaite polojitelni chilsa za argument [broi]!"),
     YOU_HAVE("&6Ti imash &5{1}&6 kredita."),
     USER_HAS("&5{1}&6 ima &5{2}&6 kredita."),

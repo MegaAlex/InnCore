@@ -1,7 +1,7 @@
 package me.megaalex.inncore.credits;
 
 import me.megaalex.inncore.messages.Message;
-import me.megaalex.inncore.messages.MessageManager;
+import me.megaalex.inncore.messages.MessageUtils;
 import me.megaalex.inncore.utils.NumberUtils;
 import me.megaalex.inncore.utils.PlayerUtils;
 import org.bukkit.entity.Player;
@@ -30,11 +30,11 @@ public class CheckTask extends BukkitRunnable {
             return;
 
         if(senderName.equalsIgnoreCase(checkName)) {
-            MessageManager.sendMsg(player, Message.MORE_HELP);
-            MessageManager.sendMsg(player, Message.YOU_HAVE,
+            MessageUtils.sendMsg(player, Message.MORE_HELP);
+            MessageUtils.sendMsg(player, Message.YOU_HAVE,
                     NumberUtils.parseDecimal(credits));
         } else {
-            MessageManager.sendMsg(player,Message.USER_HAS,
+            MessageUtils.sendMsg(player,Message.USER_HAS,
                     checkName, NumberUtils.parseDecimal(credits));
         }
     }

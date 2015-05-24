@@ -1,15 +1,12 @@
 name: InnCore
-version: 1.0
+version: 1.2
 main: me.megaalex.inncore.InnCore
-depend: [WorldEdit]
+depend: [WorldEdit, Vault]
+softdepend: [Citizens]
 commands:
-    credits:
-        description: InnCraft Credits system
+    inn:
+        description: InnCraft main core command
         usage: ./<command>
-# TODO: Enable this
-#    pvp:
-#        description: InnCraft show PVP scoreboard
-#        usage: ./<command>
 permissions:
   inncraft.admin:
     description: Gives all admin and user permissions

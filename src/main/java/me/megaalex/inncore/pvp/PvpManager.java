@@ -1,5 +1,15 @@
 package me.megaalex.inncore.pvp;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
+
 import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.Manager;
 import me.megaalex.inncore.database.Sql;
@@ -7,15 +17,6 @@ import me.megaalex.inncore.pvp.scoreboard.ScoreHideTask;
 import me.megaalex.inncore.pvp.scoreboard.ScoreShowTask;
 import me.megaalex.inncore.pvp.scoreboard.ScoreUpdate;
 import me.megaalex.inncore.utils.PvpUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class PvpManager extends Manager {
 
@@ -28,6 +29,7 @@ public class PvpManager extends Manager {
     public void onEnable() {
         if(!InnCore.getInstance().getConfigManager().pvpConfig.isEnabled())
             return;
+        super.onEnable();
         updateScoreTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
                 InnCore.getInstance(), new ScoreUpdate(), 20L,
                 InnCore.getInstance().getConfigManager().pvpConfig.getScoreUpdate());
@@ -71,7 +73,6 @@ public class PvpManager extends Manager {
     public void showTopKillScore(Player player) {
         if(shownScoreboard.contains(player.getUniqueId()))
             return;
-        //System.out.println(topBoard.toString());
         shownScoreboard.add(player.getUniqueId());
         PvpUtils.showTopScoreFor(player, topBoard);
         Bukkit.getScheduler().runTaskLater(InnCore.getInstance(),
@@ -85,12 +86,15 @@ public class PvpManager extends Manager {
 
     @Override
     public void onDisable() {
-        if(shownScoreboard == null || shownScoreboard.isEmpty())
-            return;
+        if(isEnabled()) {
+            if (shownScoreboard == null || shownScoreboard.isEmpty())
+                return;
 
-        for(UUID playerId : shownScoreboard) {
-            hideTopKillScore(playerId);
+            for (UUID playerId : shownScoreboard) {
+                hideTopKillScore(playerId);
+            }
         }
+        super.onDisable();
     }
 
     public void hideTopKillScore(UUID playerId) {

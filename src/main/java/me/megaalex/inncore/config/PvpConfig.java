@@ -1,6 +1,10 @@
 package me.megaalex.inncore.config;
 
-public class PvpConfig {
+import org.bukkit.configuration.ConfigurationSection;
+
+import me.megaalex.inncore.InnCore;
+
+public class PvpConfig implements SubConfig {
 
     private boolean enabled;
 
@@ -13,6 +17,25 @@ public class PvpConfig {
     private long scoreUpdate;
     private int scorePlayers;
 
+    @Override
+    public String getSubName() {
+        return "pvp";
+    }
+
+    @Override
+    public void loadConfig(final ConfigurationSection config) {
+        this.enabled = config.getBoolean("enabled", false);
+        this.countTable = config.getString("killsTable", "inncore_kills");
+        this.historyTable = config.getString("historyTable", "inncore_kills-h");
+
+        // PvP Scoreboard Settings
+        this.useScoreboard = config.getBoolean("scoreboard.use", false);
+        this.scoreDelay = config.getLong("scoreboard.delay", 6000L);
+        this.scoreTime = config.getLong("scoreboard.time", 200L);
+        this.scoreUpdate = config.getLong("scoreboard.update", 3600L);
+        this.scorePlayers = config.getInt("scoreboard.players", 10);
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -22,7 +45,7 @@ public class PvpConfig {
     }
 
     public String getCountTable() {
-        return countTable;
+        return getDBPrefix() + countTable;
     }
 
     public void setCountTable(String countTable) {
@@ -30,7 +53,7 @@ public class PvpConfig {
     }
 
     public String getHistoryTable() {
-        return historyTable;
+        return getDBPrefix() + historyTable;
     }
 
     public void setHistoryTable(String historyTable) {
@@ -80,5 +103,9 @@ public class PvpConfig {
 
     public void setScoreUpdate(long scoreUpdate) {
         this.scoreUpdate = scoreUpdate;
+    }
+
+    private String getDBPrefix() {
+        return InnCore.getInstance().getConfigManager().databasePrefix;
     }
 }

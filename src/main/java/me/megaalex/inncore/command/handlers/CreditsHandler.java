@@ -1,26 +1,28 @@
-package me.megaalex.inncore.command;
+package me.megaalex.inncore.command.handlers;
 
-import me.megaalex.inncore.InnCore;
-import me.megaalex.inncore.credits.ChangeTask;
-import me.megaalex.inncore.credits.CheckTask;
-import me.megaalex.inncore.messages.Message;
-import me.megaalex.inncore.messages.MessageManager;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import me.megaalex.inncore.InnCore;
+import me.megaalex.inncore.command.InnCoreCommand;
+import me.megaalex.inncore.credits.ChangeTask;
+import me.megaalex.inncore.credits.CheckTask;
 
-public class CreditsCommand implements CommandExecutor {
+public class CreditsHandler implements InnCoreHandler {
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd,
-                             String label, String[] args) {
-        if(!cmd.getName().equalsIgnoreCase("credits")) {
-            return false;
-        }
+    public String getName() {
+        return "credits";
+    }
+
+    @Override
+    public void handle(InnCoreCommand cmd, CommandSender sender, String[] args) {
 
         if((sender instanceof ConsoleCommandSender) && args.length == 3
                 && (args[0].equalsIgnoreCase("grant")|| args[0].equalsIgnoreCase("deduct")
@@ -34,16 +36,16 @@ public class CreditsCommand implements CommandExecutor {
             } else if(subCmd.equalsIgnoreCase("deduct")) {
                 changeType = ChangeTask.ChangeType.DEDUCT;
             } else {
-                return true;
+                return;
             }
 
             processPayment(sender, args, changeType,
-                    null, "Console");
+                    null, "Console", cmd);
 
         }
 
         if(!(sender instanceof Player)) {
-            return true;
+            return;
         }
 
         final String senderName = sender.getName();
@@ -52,35 +54,35 @@ public class CreditsCommand implements CommandExecutor {
         if(args.length == 0) {
             // showHelp(sender, 1);
             if(!sender.hasPermission("inncraft.credits")) {
-                MessageManager.sendMsg(sender, Message.NOPERM);
-                return true;
+                cmd.sendNoPerm(sender);
+                return;
             }
             InnCore.getInstance().getServer().getScheduler().runTaskAsynchronously(
                     InnCore.getInstance(), new CheckTask(senderId, senderName, senderName));
-            return true;
+            return;
         }
 
         String subCmd = args[0];
 
         if(subCmd.equalsIgnoreCase("help")) {
-            showHelp(sender, 1);
-            return true;
+            sendHelp(sender, 1, cmd);
+            return;
         }
 
         if(subCmd.equalsIgnoreCase("show")) {
             if(!sender.hasPermission("inncraft.credits.show")) {
-                MessageManager.sendMsg(sender, Message.NOPERM);
-                return true;
+                cmd.sendNoPerm(sender);
+                return;
             }
             if(args.length != 2) {
-                showHelp(sender, 20);
-                return true;
+                cmd.sendHelp(sender, getCmds(sender));
+                return;
             }
 
             final String checkPlayer = args[1];
             InnCore.getInstance().getServer().getScheduler().runTaskAsynchronously(
                     InnCore.getInstance(), new CheckTask(senderId, senderName, checkPlayer));
-            return true;
+            return;
         }
 
         if(subCmd.equalsIgnoreCase("send") || subCmd.equalsIgnoreCase("grant")
@@ -107,26 +109,52 @@ public class CreditsCommand implements CommandExecutor {
             }
 
             if(!sender.hasPermission(perm)) {
-                MessageManager.sendMsg(sender, Message.NOPERM);
-                return true;
+                cmd.sendNoPerm(sender);
+                return;
             }
             if(args.length != 3) {
-                showHelp(sender, helpType);
-                return true;
+                sendHelp(sender, helpType, cmd);
+                return;
             }
             processPayment(sender, args, changeType,
-                    senderId, senderName);
-            return true;
+                    senderId, senderName, cmd);
+            return;
         }
 
-        showHelp(sender, 1);
+        sendHelp(sender, 1, cmd);
+    }
 
-        return true;
+    @Override
+    public List<String> getCmds(CommandSender sender) {
+        final ArrayList<String> cmds = new ArrayList<>();
+        if(sender.hasPermission("inncraft.credits"))
+            cmds.add("credits - Pokazva kolko kredita imash");
+        if(sender.hasPermission("inncraft.credits.help"))
+            cmds.add("credits help - pokazva pomoshtna informaciq");
+        if(sender.hasPermission("inncraft.credits.send")) {
+            cmds.add("credits send [igrach] [bori] - Izprashta krediti na igrach");
+        }
+        if(sender.hasPermission("inncraft.credits.show")) {
+            cmds.add("credits show [igrach] - Pokazva kolko kredita ima igrach");
+        }
+
+        if(sender.hasPermission("inncraft.credits.grant")) {
+            cmds.add("credits grant [igrach] [bori] - Dava krediti na igrach");
+        }
+
+        if(sender.hasPermission("inncraft.credits.deduct")) {
+            cmds.add("credits deduct [igrach] [bori] - Vzima krediti ot igrach");
+        }
+
+        if(sender.hasPermission("inncraft.credits.set")) {
+            cmds.add("credits set [igrach] [bori] - Promenq broq krediti na igrach");
+        }
+        return cmds;
     }
 
     private void processPayment(CommandSender sender, String args[],
                                 ChangeTask.ChangeType changeType, UUID senderId,
-                                String senderName) {
+                                String senderName, InnCoreCommand cmd) {
 
         try {
             final String receiverName = args[1];
@@ -137,53 +165,46 @@ public class CreditsCommand implements CommandExecutor {
                     InnCore.getInstance(), new ChangeTask(changeType, senderId,
                             senderName, receiverName, amount));
         } catch (NumberFormatException e) {
-            showHelp(sender, 10);
+            sendHelp(sender, 10, cmd);
         }
     }
 
-    private void showHelp(CommandSender sender, int type) {
+    private void sendHelp(CommandSender sender, int type, InnCoreCommand cmd) {
+        final ArrayList<String> cmds = new ArrayList<>();
         if(!sender.hasPermission("inncraft.credits.help")) {
-            MessageManager.sendMsg(sender, Message.NOPERM);
             return;
         }
-        MessageManager.sendMsg(sender, Message.HELP_HEADER);
+
         if(type == 1) {
             if(sender.hasPermission("inncraft.credits"))
-                MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                        "/credits", "Pokazva kolko kredita imash");
+                cmds.add("/credits - Pokazva kolko kredita imash");
             if(sender.hasPermission("inncraft.credits.help"))
-                MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                        "/credits help", "Pokazva pomoshtna informaciq");
+                cmds.add("/credits help - Pokazva pomoshtna informaciq");
         }
-
         if((type == 1 || type == 10)
                 && sender.hasPermission("inncraft.credits.send")) {
-            MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                    "/credits send [igrach] [bori]", "Izprashta krediti na igrach");
+            cmds.add("/credits send [igrach] [bori] - Izprashta krediti na igrach");
         }
 
         if((type == 1 || type == 20)
                 && sender.hasPermission("inncraft.credits.show")) {
-            MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                    "/credits show [igrach]", "Pokazva kolko kredita ima igrach");
+            cmds.add("/credits show [igrach] - Pokazva kolko kredita ima igrach");
         }
 
         if((type == 1 || type == 30)
                 && sender.hasPermission("inncraft.credits.grant")) {
-            MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                    "/credits grant [igrach] [bori]", "Dava krediti na igrach");
+            cmds.add("/credits grant [igrach] [bori] - Dava krediti na igrach");
         }
 
         if((type == 1 || type == 40)
                 && sender.hasPermission("inncraft.credits.deduct")) {
-            MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                    "/credits deduct [igrach] [bori]", "Vzima krediti ot igrach");
+            cmds.add("/credits deduct [igrach] [bori] - Vzima krediti ot igrach");
         }
 
         if((type == 1 || type == 50)
                 && sender.hasPermission("inncraft.credits.set")) {
-            MessageManager.sendMsg(sender, Message.HELP_COMMNAD,
-                    "/credits set [igrach] [bori]", "Promenq broq krediti na igrach");
+            cmds.add("/credits set [igrach] [bori] - Promenq broq krediti na igrach");
         }
+        cmd.sendHelp(sender, cmds);
     }
 }

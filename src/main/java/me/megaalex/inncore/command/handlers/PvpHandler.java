@@ -17,12 +17,12 @@ public class PvpHandler implements InnCoreHandler {
     }
 
     @Override
-    public void handle(InnCoreCommand cmd, CommandSender sender, String[] args) {
+    public void handle(InnCoreCommand cmd, CommandSender sender, String usedCmd, String[] args) {
         if(!(sender instanceof Player)) {
            return;
         }
         if(!sender.hasPermission("inncore.pvp")) {
-            cmd.sendNoPerm(sender);
+            InnCoreCommand.sendNoPerm(sender);
             return;
         }
         InnCore.getInstance().getPvpManager().showTopKillScore((Player) sender);

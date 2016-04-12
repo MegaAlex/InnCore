@@ -13,20 +13,17 @@ public class ConfigManager extends Manager {
 
     public List<String> enabledCommands;
 
-    public String databaseHost;
-    public String databaseUser;
-    public String databasePass;
-    public String databaseDb;
-    public String databasePrefix;
-
+    private DatabaseConfig databaseConfig;
     public PvpConfig pvpConfig;
     private ChatSyncConfig chatSyncConfig;
     private LoginLogConfig loginLogConfig;
     private FactionMiscConfig factionMiscConfig;
-
+    private NpcConfig npcConfig;
+    private MiscConfig miscConfig;
+    private SkyBlockConfig skyConfig;
     private List<SubConfig> subConfigList;
 
-    public List<String> npcPermittedGroups;
+
 
     public boolean debug;
 
@@ -34,15 +31,59 @@ public class ConfigManager extends Manager {
     public void onEnable() {
         super.onEnable();
         enabledCommands = new ArrayList<>();
+        databaseConfig = new DatabaseConfig();
         pvpConfig = new PvpConfig();
         chatSyncConfig = new ChatSyncConfig();
         factionMiscConfig = new FactionMiscConfig();
+        npcConfig = new NpcConfig();
+        miscConfig = new MiscConfig();
+        skyConfig = new SkyBlockConfig();
+
 
         subConfigList = new ArrayList<>();
+        subConfigList.add(databaseConfig);
         subConfigList.add(pvpConfig);
         subConfigList.add(chatSyncConfig);
         subConfigList.add(factionMiscConfig);
+        subConfigList.add(npcConfig);
+        subConfigList.add(miscConfig);
+        subConfigList.add(skyConfig);
         loadConfig();
+    }
+
+    // Migrate config to a new version
+    private void migrateConfig() {
+        final InnCore plugin = InnCore.getInstance();
+        FileConfiguration config = plugin.getConfig();
+
+        // Migration 1: added global & server db settings
+        if(config.contains("database.host")) {
+            config.set("database.global.host", config.getString("database.host"));
+            config.set("database.server.host", config.getString("database.host"));
+            config.set("database.host", null);
+        }
+        if(config.contains("database.user")) {
+            config.set("database.global.user", config.getString("database.user"));
+            config.set("database.server.user", config.getString("database.user"));
+            config.set("database.user", null);
+        }
+        if(config.contains("database.pass")) {
+            config.set("database.global.pass", config.getString("database.pass"));
+            config.set("database.server.pass", config.getString("database.pass"));
+            config.set("database.pass", null);
+        }
+        if(config.contains("database.db")) {
+            config.set("database.global.db", config.getString("database.db"));
+            config.set("database.serve.db", config.getString("database.db"));
+            config.set("database.db", null);
+        }
+        if(config.contains("database.prefix")) {
+            config.set("database.server.prefix", config.getString("database.prefix"));
+            config.set("database.db", null);
+        }
+
+        plugin.saveConfig();
+        plugin.reloadConfig();
     }
 
     private void loadConfig() {
@@ -51,11 +92,8 @@ public class ConfigManager extends Manager {
         plugin.saveConfig();
         plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
-        databaseHost = config.getString("database.host", "localhost:3306");
-        databaseUser = config.getString("database.username", "root");
-        databasePass = config.getString("database.password", "pass");
-        databaseDb = config.getString("database.database", "db");
-        databasePrefix = config.getString("database.prefix", "");
+
+        migrateConfig();
 
         debug = config.getBoolean("debug", false);
 
@@ -74,8 +112,11 @@ public class ConfigManager extends Manager {
                 enabledCommands.add(key);
             }
         }
-        // Load NPC config
-        npcPermittedGroups = config.getStringList("npc.permittedGroups");
+
+    }
+
+    public DatabaseConfig getDatabaseConfig() {
+        return databaseConfig;
     }
 
     public ChatSyncConfig getChatSyncConfig() {
@@ -93,4 +134,17 @@ public class ConfigManager extends Manager {
     public LoginLogConfig getLoginLogConfig() {
         return loginLogConfig;
     }
+
+    public NpcConfig getNpcConfig() {
+        return npcConfig;
+    }
+
+    public MiscConfig getMiscConfig() {
+        return miscConfig;
+    }
+
+    public SkyBlockConfig getSkyConfig() {
+        return skyConfig;
+    }
+
 }

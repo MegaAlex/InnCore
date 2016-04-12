@@ -3,67 +3,48 @@ package me.megaalex.inncore.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.Manager;
-import me.megaalex.inncore.config.ConfigManager;
+import me.megaalex.inncore.config.DatabaseConfig;
 
 public class DatabaseManager extends Manager {
 
-    private Connection con = null;
+    private Set<SqlModule> sqlModuleList;
 
-    public Sql getSql() {
-        return new Sql(getConnection());
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        sqlModuleList = new HashSet<>();
     }
 
-    public Connection getConnection() {
-        if(con == null) {
-            con = getNewConnection();
+    public SqlConnection getConnection(ConnectionType type) {
+
+        DatabaseData data;
+        DatabaseConfig config = InnCore.getInstance().getConfigManager().getDatabaseConfig();
+
+        if(type == ConnectionType.GLOBAL) {
+            data = config.globalData;
+        } else {
+            data = config.serverData;
         }
 
-        Statement stmt = null;
+        Connection con;
         try {
-            stmt = con.createStatement();
-            stmt.executeQuery("SELECT 1");
-        }
-        catch (SQLException e) {
-            con = getNewConnection();
-        }
-        finally {
-            try {
-            if (stmt != null)
-                stmt.close();
-            } catch (SQLException ignored) {
-            }
-        }
-
-        return con;
-    }
-
-    private Connection getNewConnection() {
-
-        Connection con = null;
-        try {
-            ConfigManager config = InnCore.getInstance().getConfigManager();
-            con = DriverManager.getConnection("jdbc:mysql://" + config.databaseHost + "/"
-                    + config.databaseDb, config.databaseUser, config.databasePass);
+            con = DriverManager.getConnection("jdbc:mysql://" + data.databaseHost + "/"
+                    + data.databaseDb, data.databaseUser, data.databasePass);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
 
-        return con;
+        return new SqlConnection(con, data.databasePrefix);
     }
 
-    public void closeConnection(Connection conn) {
-
-        try {
-            if (conn != null)
-                conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+    public void registerSqlModule(SqlModule module) {
+        sqlModuleList.add(module);
+        module.setupTables();
     }
 }

@@ -2,8 +2,6 @@ package me.megaalex.inncore.config;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import me.megaalex.inncore.InnCore;
-
 public class PvpConfig implements SubConfig {
 
     private boolean enabled;
@@ -45,7 +43,7 @@ public class PvpConfig implements SubConfig {
     }
 
     public String getCountTable() {
-        return getDBPrefix() + countTable;
+        return countTable;
     }
 
     public void setCountTable(String countTable) {
@@ -53,7 +51,7 @@ public class PvpConfig implements SubConfig {
     }
 
     public String getHistoryTable() {
-        return getDBPrefix() + historyTable;
+        return historyTable;
     }
 
     public void setHistoryTable(String historyTable) {
@@ -103,9 +101,5 @@ public class PvpConfig implements SubConfig {
 
     public void setScoreUpdate(long scoreUpdate) {
         this.scoreUpdate = scoreUpdate;
-    }
-
-    private String getDBPrefix() {
-        return InnCore.getInstance().getConfigManager().databasePrefix;
     }
 }

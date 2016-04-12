@@ -13,6 +13,11 @@ public class VaultManager extends Manager {
     private Permission permission = null;
 
     @Override
+    public String getEnableConfigName() {
+        return "npc.enabled";
+    }
+
+    @Override
     public void onEnable() {
         super.onEnable();
         setupPermissions();
@@ -31,7 +36,7 @@ public class VaultManager extends Manager {
 
     public boolean addPlayerToGroup(final Player player, final String groupName) {
         final String[] groups = permission.getGroups();
-        final List<String> permittedGroups = InnCore.getInstance().getConfigManager().npcPermittedGroups;
+        final List<String> permittedGroups = InnCore.getInstance().getConfigManager().getNpcConfig().npcPermittedGroups;
 
         if(!permittedGroups.contains(groupName)) {
             throw new IllegalArgumentException("Not permitted group " + groupName);

@@ -11,6 +11,8 @@ public class FactionsMiscManager extends Manager {
         return "factionsmisc.enabled";
     }
 
+    private boolean hasWorldGuard;
+
     @Override
     public void onEnable() {
         InnCore plugin = InnCore.getInstance();
@@ -19,6 +21,12 @@ public class FactionsMiscManager extends Manager {
 
         // Register events
         InnCore.debug("Registering events");
-        plugin.getServer().getPluginManager().registerEvents(new FactionMiscListener(config), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new FactionMiscListener(config, this), plugin);
+
+        hasWorldGuard = (plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard"));
+    }
+
+    public boolean hasWorldGuard() {
+        return hasWorldGuard;
     }
 }

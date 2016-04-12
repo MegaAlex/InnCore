@@ -11,6 +11,8 @@ public class CmdRewriteListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPreCommand(PlayerCommandPreprocessEvent e) {
-        InnCore.getInstance().getCmdRewriteManager().processCommand(e.getPlayer(), e.getMessage());
+        if(InnCore.getInstance().getCmdRewriteManager().processCommand(e.getPlayer(), e.getMessage())) {
+            e.setCancelled(true);
+        }
     }
 }

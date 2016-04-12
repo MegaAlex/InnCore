@@ -1,19 +1,30 @@
 package me.megaalex.inncore.credits;
 
-import me.megaalex.inncore.messages.Message;
-import me.megaalex.inncore.utils.PlayerUtils;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import org.bukkit.scheduler.BukkitRunnable;
+
+import me.megaalex.inncore.messages.Message;
+import me.megaalex.inncore.utils.PlayerUtils;
 
 public class ChangeTask extends BukkitRunnable {
 
     public enum ChangeType {
-        SEND,
-        GRANT,
-        DEDUCT,
-        SET
+        SEND(1),
+        GRANT(2),
+        DEDUCT(3),
+        SET(4);
+
+        private int type;
+
+        ChangeType(int type) {
+            this.type = type;
+        }
+
+        public int getType() {
+            return type;
+        }
     }
 
     private ChangeType change;
@@ -33,7 +44,7 @@ public class ChangeTask extends BukkitRunnable {
     public ChangeTask(ChangeType change, UUID executorId, String executorName,
                       String receiverName, double creditsChange) {
         setValues(change, executorId, executorName,
-                receiverName, new BigDecimal(creditsChange).setScale(2));
+                receiverName, new BigDecimal(creditsChange).setScale(2, BigDecimal.ROUND_HALF_UP));
     }
 
     private void setValues(ChangeType change, UUID executorId, String executorName,
@@ -107,6 +118,10 @@ public class ChangeTask extends BukkitRunnable {
             msgTypeExecutor = Message.TAKEN;
             msgTypeReceiver = Message.TOOK;
         }
+
+        Long time = System.currentTimeMillis() / 1000L;
+        TransactionData transactionData = new TransactionData(executorName, receiverName, creditsChange, time, change.getType());
+        CreditsManager.saveTransaction(transactionData);
 
         PlayerUtils.sendMessage(executorId, msgTypeExecutor,
                 receiverName, creditsChange.toPlainString());

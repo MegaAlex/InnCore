@@ -42,6 +42,6 @@ public class LoginLogConfig implements SubConfig {
     }
 
     private String getDBPrefix() {
-        return InnCore.getInstance().getConfigManager().databasePrefix;
+        return InnCore.getInstance().getConfigManager().getDatabaseConfig().globalData.databasePrefix;
     }
 }

@@ -16,7 +16,10 @@ import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.VaultManager;
 import me.megaalex.inncore.utils.FireworksUtils;
 import me.megaalex.inncore.utils.PlayerUtils;
+import net.citizensnpcs.api.ai.speech.Talkable;
 import net.citizensnpcs.api.ai.speech.event.SpeechBystanderEvent;
+import net.citizensnpcs.api.ai.speech.event.SpeechTargetedEvent;
+import net.citizensnpcs.api.event.NPCLeftClickEvent;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
@@ -45,6 +48,12 @@ public class RaceSelectTrait extends Trait {
 
     @Persist
     public String alreadyJoined = "Ti veche imash rasa!";
+
+    @Persist
+    public String joinAnnounceText;
+
+    @Persist
+    public String leftClickText;
 
     public RaceSelectTrait() {
         super(TRAIT_NAME);
@@ -80,6 +89,33 @@ public class RaceSelectTrait extends Trait {
 
     }
 
+    @EventHandler
+    public void onTargetSpeakEvent(final SpeechTargetedEvent e) {
+        if(e.getContext().getTalker().getEntity() != this.npc.getEntity()) {
+            return;
+        }
+        for (Talkable talkable : e.getContext()) {
+            if (!(talkable.getEntity() instanceof Player)) {
+                continue;
+            }
+            Player player = (Player) talkable.getEntity();
+            if (player.hasPermission("inncore.race")) {
+                e.setCancelled(true);
+            }
+            return;
+        }
+        /*for(Talkable talkable : e.getContext()) {
+            if(!(talkable.getEntity() instanceof Player)) {
+                continue;
+            }
+            Player player = (Player) talkable.getEntity();
+            if(player.hasPermission("inncore.race")) {
+                e.setCancelled(true);
+                return;
+            }
+        }*/
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRightClick(final NPCRightClickEvent e) {
         final Player player = e.getClicker();
@@ -93,7 +129,9 @@ public class RaceSelectTrait extends Trait {
         }
 
         if(player.hasPermission("inncore.race")) {
-            PlayerUtils.sendMessage(player, alreadyJoined);
+            if(alreadyJoined != null) {
+                PlayerUtils.sendMessage(player, alreadyJoined);
+            }
             return;
         }
 
@@ -122,6 +160,21 @@ public class RaceSelectTrait extends Trait {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onLeftClick(NPCLeftClickEvent e) {
+        final Player player = e.getClicker();
+
+        if (e.getNPC() != this.npc || "".equals(groupName)) {
+            return;
+        }
+
+        if(player.hasPermission("inncore.race")) {
+            PlayerUtils.sendMessage(player, leftClickText);
+        } else {
+            PlayerUtils.sendMessage(player, alreadyJoined);
+        }
+    }
+
     private void postJoin(final Player player) {
         new BukkitRunnable() {
             private int runs = 3;
@@ -138,6 +191,8 @@ public class RaceSelectTrait extends Trait {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(InnCore.getInstance(), 0L, 15L);
+        }.runTaskTimer(InnCore.getInstance(), 0L, 10L);
+        PlayerUtils.sendMessageAllWithPermExcept(player.getUniqueId(),
+                "inncore.race." + groupName, joinAnnounceText, player.getName());
     }
 }

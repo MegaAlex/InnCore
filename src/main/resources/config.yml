@@ -1,17 +1,46 @@
 database:
-  username: root
-  password: pass
-  database: db
-  host: 'localhost:3306'
-  prefix: 'factions_'
+  global:
+    username: root
+    password: pass
+    database: db
+    host: 'localhost:3306'
+    prefix: ''
+  server:
+    username: root
+    password: pass
+    database: db
+    host: 'localhost:3306'
+    prefix: 'factions_'
 commands:
   pvp: false
   inn: true
   credits: true
-  npc: true
+  gbroadcast: true
+  stp: true
+  server: true
 cmdrewrite:
-  credits: credits
-  pvp: pvp
+  enabled: true
+  rewrite:
+    credits: credits
+    pvp: pvp
+    gbroadcast: gbroadcast
+    stp: stp
+news:
+  enabled: false
+misc:
+  color:
+    sign: true
+    book: false
+  serverList:
+  - creative
+  - factions
+  - minigames
+  - lobby
+  spawn:
+    tpOnFall: false
+    worlds:
+    - world
+    tpOnJoin: false
 pvp:
   enabled: false
   killsTable: inncore_kills
@@ -29,6 +58,9 @@ loginlog:
   authTable: inncore_authentications
 npc:
   enabled: false
+  staffMember:
+    enabled: true
+    yOffset: 3.5
   permittedGroups:
   - light
   - dark
@@ -46,7 +78,19 @@ factionsmisc:
   mining:
     enabled: true
     permission: inncraft.mining
+    disableWorldMining: true
   disableStr2Potions: true
   obsidian:
     enabled: true
     message: '&cYou can only get obsidian from the shop!'
+  fixReportRtsCmd: true
+  disableVillagerTrading: true
+  rightClickIronDoors: true
+  nerfXP: true
+skyblock:
+  enabled: false
+  fall:
+    saveInv: true
+    table: inncore_fallInventories
+
+

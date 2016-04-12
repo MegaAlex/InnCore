@@ -1,24 +1,25 @@
 package me.megaalex.inncore.pvp.scoreboard;
 
-import me.megaalex.inncore.InnCore;
-import me.megaalex.inncore.database.Sql;
-import org.bukkit.Bukkit;
+import java.util.HashMap;
+
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
+import me.megaalex.inncore.InnCore;
+import me.megaalex.inncore.pvp.PvpSqlModule;
 
 public class ScoreUpdate extends BukkitRunnable {
 
     @Override
     public void run() {
-        Sql sql = InnCore.getInstance().getDatabaseManager().getSql();
-        int players = InnCore.getInstance().getConfigManager().pvpConfig.getScorePlayers();
+        final InnCore plugin = InnCore.getInstance();
+        PvpSqlModule sql = plugin.getPvpManager().getSql();
+        int players = plugin.getConfigManager().pvpConfig.getScorePlayers();
         final HashMap<String,Integer> topKillers = sql.getTopKillers(players);
-        Bukkit.getScheduler().runTask(InnCore.getInstance(), new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
-                InnCore.getInstance().getPvpManager().setTopScores(topKillers);
+                plugin.getPvpManager().setTopScores(topKillers);
             }
-        });
+        }.runTask(plugin);
     }
 }

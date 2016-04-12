@@ -18,7 +18,7 @@ public class NpcHandler implements InnCoreHandler {
     }
 
     @Override
-    public void handle(InnCoreCommand cmd, CommandSender sender, String[] args) {
+    public void handle(InnCoreCommand cmd, CommandSender sender, String usedCmd, String[] args) {
         if(args.length < 1) {
             cmd.sendHelp(sender, getCmds(sender));
             return;
@@ -27,7 +27,7 @@ public class NpcHandler implements InnCoreHandler {
         final String subCmd = args[0];
 
         if(!(sender instanceof Player)) {
-            cmd.sendError(sender, "Only players can use this command!");
+            InnCoreCommand.sendError(sender, "Only players can use this command!");
             return;
         }
 
@@ -35,7 +35,7 @@ public class NpcHandler implements InnCoreHandler {
         final NPC npc = CitizensAPI.getDefaultNPCSelector().getSelected(player);
 
         if(npc == null) {
-            cmd.sendError(sender, "Select a NPC before using this command!");
+            InnCoreCommand.sendError(sender, "Select a NPC before using this command!");
             return;
         }
 
@@ -45,60 +45,102 @@ public class NpcHandler implements InnCoreHandler {
         }
 
         if(!npc.hasTrait(RaceSelectTrait.class)) {
-            cmd.sendError(sender, "This NPC doesn't have the race select trait!");
+            InnCoreCommand.sendError(sender, "This NPC doesn't have the race select trait!");
             return;
         }
 
         final RaceSelectTrait trait = npc.getTrait(RaceSelectTrait.class);
 
-        if(subCmd.equals("setgroupname")) {
+        if(subCmd.equalsIgnoreCase("setgroupname")) {
             final String groupName = args[1];
 
             if(!sender.hasPermission("inncore.npc.setgroupname")) {
-                cmd.sendNoPerm(sender);
+                InnCoreCommand.sendNoPerm(sender);
                 return;
             }
 
             trait.groupName = groupName;
-            cmd.sendSuccess(sender, "Set group Name successfully!");
+            InnCoreCommand.sendSuccess(sender, "Set group Name successfully!");
             return;
         }
 
-        if(subCmd.equals("setracename")) {
+        if(subCmd.equalsIgnoreCase("setracename")) {
             final String raceName = args[1];
 
             if(!sender.hasPermission("inncore.npc.setracename")) {
-                cmd.sendNoPerm(sender);
+                InnCoreCommand.sendNoPerm(sender);
                 return;
             }
 
             trait.raceName = raceName;
-            cmd.sendSuccess(sender, "Set race name successfully!");
+            InnCoreCommand.sendSuccess(sender, "Set race name successfully!");
             return;
         }
 
-        if(subCmd.equals("clickagain")) {
+        if(subCmd.equalsIgnoreCase("clickagain")) {
             String clickMsg = getMsg(args);
 
             if(!sender.hasPermission("inncore.npc.clickagain")) {
-                cmd.sendNoPerm(sender);
+                InnCoreCommand.sendNoPerm(sender);
                 return;
             }
 
             trait.clickAgain = clickMsg;
-            cmd.sendSuccess(sender, "Set click again message successfully!");
+            InnCoreCommand.sendSuccess(sender, "Set click again message successfully!");
         }
 
-        if(subCmd.equals("selecttext")) {
+        if(subCmd.equalsIgnoreCase("selecttext")) {
             String selectMsg = getMsg(args);
 
             if(!sender.hasPermission("inncore.npc.selecttext")) {
-                cmd.sendNoPerm(sender);
+                InnCoreCommand.sendNoPerm(sender);
                 return;
             }
 
             trait.selectText = selectMsg;
-            cmd.sendSuccess(sender, "Set select race message successfully!");
+            InnCoreCommand.sendSuccess(sender, "Set select race message successfully!");
+        }
+
+        if(subCmd.equalsIgnoreCase("alreadyjoined")) {
+            String alreadyJoinedMessage = getMsg(args);
+
+            if(!sender.hasPermission("inncore.npc.alreadyjoined")) {
+                InnCoreCommand.sendNoPerm(sender);
+                return;
+            }
+
+            trait.alreadyJoined = alreadyJoinedMessage;
+            InnCoreCommand.sendSuccess(sender, "Set already joined message successfully!");
+        }
+
+        if(subCmd.equalsIgnoreCase("announcetext")) {
+            String announceText = getMsg(args);
+            if(announceText.isEmpty()) {
+                announceText = null;
+            }
+
+            if(!sender.hasPermission("inncore.npc.announcetext")) {
+                InnCoreCommand.sendNoPerm(sender);
+                return;
+            }
+
+            trait.joinAnnounceText = announceText;
+            InnCoreCommand.sendSuccess(sender, "Set join broadcast message successfully!");
+        }
+
+        if(subCmd.equalsIgnoreCase("leftclicktext")) {
+            String leftClickText = getMsg(args);
+            if(leftClickText.isEmpty()) {
+                leftClickText = null;
+            }
+
+            if(!sender.hasPermission("inncore.npc.leftclicktext")) {
+                InnCoreCommand.sendNoPerm(sender);
+                return;
+            }
+
+            trait.leftClickText = leftClickText;
+            InnCoreCommand.sendSuccess(sender, "Set left click message successfully!");
         }
     }
 
@@ -118,8 +160,14 @@ public class NpcHandler implements InnCoreHandler {
         if(sender.hasPermission("inncore.npc.selecttext")) {
             commands.add("npc selecttext [message] - sets race select msg");
         }
-        if(sender.hasPermission("inncore.npc.undertext")) {
-            commands.add("npc undertext [text] - sets under text");
+        if(sender.hasPermission("inncore.npc.alreadyjoined")) {
+            commands.add("npc alreadyjoined [text] - sets the already joined msg");
+        }
+        if(sender.hasPermission("inncore.npc.announcetext")) {
+            commands.add("npc announcetext [text] - sets the announce msg");
+        }
+        if(sender.hasPermission("inncore.npc.leftclicktext")) {
+            commands.add("npc leftclicktext [text] - sets the left click msg");
         }
         return commands;
     }

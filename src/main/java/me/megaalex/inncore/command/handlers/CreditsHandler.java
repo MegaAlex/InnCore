@@ -13,6 +13,7 @@ import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.command.InnCoreCommand;
 import me.megaalex.inncore.credits.ChangeTask;
 import me.megaalex.inncore.credits.CheckTask;
+import me.megaalex.inncore.credits.TopListTask;
 
 public class CreditsHandler implements InnCoreHandler {
 
@@ -22,7 +23,7 @@ public class CreditsHandler implements InnCoreHandler {
     }
 
     @Override
-    public void handle(InnCoreCommand cmd, CommandSender sender, String[] args) {
+    public void handle(InnCoreCommand cmd, CommandSender sender, String usedCmd, String[] args) {
 
         if((sender instanceof ConsoleCommandSender) && args.length == 3
                 && (args[0].equalsIgnoreCase("grant")|| args[0].equalsIgnoreCase("deduct")
@@ -57,8 +58,7 @@ public class CreditsHandler implements InnCoreHandler {
                 cmd.sendNoPerm(sender);
                 return;
             }
-            InnCore.getInstance().getServer().getScheduler().runTaskAsynchronously(
-                    InnCore.getInstance(), new CheckTask(senderId, senderName, senderName));
+            new CheckTask(senderId, senderName, senderName).runTaskAsynchronously(InnCore.getInstance());
             return;
         }
 
@@ -80,8 +80,7 @@ public class CreditsHandler implements InnCoreHandler {
             }
 
             final String checkPlayer = args[1];
-            InnCore.getInstance().getServer().getScheduler().runTaskAsynchronously(
-                    InnCore.getInstance(), new CheckTask(senderId, senderName, checkPlayer));
+            new CheckTask(senderId, senderName, checkPlayer).runTaskAsynchronously(InnCore.getInstance());
             return;
         }
 
@@ -121,6 +120,11 @@ public class CreditsHandler implements InnCoreHandler {
             return;
         }
 
+        if(subCmd.equalsIgnoreCase("top")) {
+            new TopListTask(senderId).runTaskAsynchronously(InnCore.getInstance());
+            return;
+        }
+
         sendHelp(sender, 1, cmd);
     }
 
@@ -128,26 +132,29 @@ public class CreditsHandler implements InnCoreHandler {
     public List<String> getCmds(CommandSender sender) {
         final ArrayList<String> cmds = new ArrayList<>();
         if(sender.hasPermission("inncraft.credits"))
-            cmds.add("credits - Pokazva kolko kredita imash");
+            cmds.add("credits - Shows how much credits you have");
         if(sender.hasPermission("inncraft.credits.help"))
             cmds.add("credits help - pokazva pomoshtna informaciq");
         if(sender.hasPermission("inncraft.credits.send")) {
-            cmds.add("credits send [igrach] [bori] - Izprashta krediti na igrach");
+            cmds.add("credits send [player] [amount] - Sends credits na player");
         }
         if(sender.hasPermission("inncraft.credits.show")) {
-            cmds.add("credits show [igrach] - Pokazva kolko kredita ima igrach");
+            cmds.add("credits show [player] - Shows how much credits player has");
         }
 
         if(sender.hasPermission("inncraft.credits.grant")) {
-            cmds.add("credits grant [igrach] [bori] - Dava krediti na igrach");
+            cmds.add("credits grant [player] [amount] - Gives credits to player");
         }
 
         if(sender.hasPermission("inncraft.credits.deduct")) {
-            cmds.add("credits deduct [igrach] [bori] - Vzima krediti ot igrach");
+            cmds.add("credits deduct [player] [amount] - Takes credits from player");
         }
 
         if(sender.hasPermission("inncraft.credits.set")) {
-            cmds.add("credits set [igrach] [bori] - Promenq broq krediti na igrach");
+            cmds.add("credits set [player] [amount] - Changes the amount of credits of player");
+        }
+        if(sender.hasPermission("inncraft.credits.top")) {
+            cmds.add("credits top - Show the players with the most credits");
         }
         return cmds;
     }
@@ -161,9 +168,8 @@ public class CreditsHandler implements InnCoreHandler {
             final BigDecimal amount = new BigDecimal(String.format("%.2f",
                     Double.parseDouble(args[2])));
 
-            InnCore.getInstance().getServer().getScheduler().runTaskAsynchronously(
-                    InnCore.getInstance(), new ChangeTask(changeType, senderId,
-                            senderName, receiverName, amount));
+            new ChangeTask(changeType, senderId,
+                    senderName, receiverName, amount).runTaskAsynchronously(InnCore.getInstance());
         } catch (NumberFormatException e) {
             sendHelp(sender, 10, cmd);
         }
@@ -177,33 +183,36 @@ public class CreditsHandler implements InnCoreHandler {
 
         if(type == 1) {
             if(sender.hasPermission("inncraft.credits"))
-                cmds.add("/credits - Pokazva kolko kredita imash");
+                cmds.add("/credits - Shows how much credits you have");
             if(sender.hasPermission("inncraft.credits.help"))
-                cmds.add("/credits help - Pokazva pomoshtna informaciq");
+                cmds.add("/credits help - Shows help");
         }
         if((type == 1 || type == 10)
                 && sender.hasPermission("inncraft.credits.send")) {
-            cmds.add("/credits send [igrach] [bori] - Izprashta krediti na igrach");
+            cmds.add("/credits send [player] [amount] - Sends credits to player");
         }
 
         if((type == 1 || type == 20)
                 && sender.hasPermission("inncraft.credits.show")) {
-            cmds.add("/credits show [igrach] - Pokazva kolko kredita ima igrach");
+            cmds.add("/credits show [player] - Shows how much credits player has");
         }
 
         if((type == 1 || type == 30)
                 && sender.hasPermission("inncraft.credits.grant")) {
-            cmds.add("/credits grant [igrach] [bori] - Dava krediti na igrach");
+            cmds.add("/credits grant [player] [amount] - Gives credits to player");
         }
 
         if((type == 1 || type == 40)
                 && sender.hasPermission("inncraft.credits.deduct")) {
-            cmds.add("/credits deduct [igrach] [bori] - Vzima krediti ot igrach");
+            cmds.add("/credits deduct [player] [amount] - Takes credits from player");
         }
 
         if((type == 1 || type == 50)
                 && sender.hasPermission("inncraft.credits.set")) {
-            cmds.add("/credits set [igrach] [bori] - Promenq broq krediti na igrach");
+            cmds.add("/credits set [player] [amount] - Changes credits of player");
+        }
+        if(type == 1 && sender.hasPermission("inncraft.credits.top")) {
+            cmds.add("/credits top - Show the players with the most credits");
         }
         cmd.sendHelp(sender, cmds);
     }

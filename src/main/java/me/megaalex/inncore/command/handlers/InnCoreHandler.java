@@ -9,6 +9,6 @@ import me.megaalex.inncore.command.InnCoreCommand;
 public interface InnCoreHandler {
 
     public String getName();
-    public void handle(InnCoreCommand cmd, CommandSender sender, String[] args);
+    public void handle(InnCoreCommand cmd, CommandSender sender, String usedCmd, String[] args);
     public List<String> getCmds(CommandSender sender);
 }

@@ -15,7 +15,7 @@ import me.megaalex.inncore.messages.MessageUtils;
 
 public class InnCoreCommand implements CommandExecutor {
 
-    private final String PREFIX = ChatColor.YELLOW + "[" + ChatColor.GREEN + "InnCore" + ChatColor.YELLOW + "]"
+    private final static String PREFIX = ChatColor.YELLOW + "[" + ChatColor.GREEN + "InnCore" + ChatColor.YELLOW + "]"
             + ChatColor.RESET + " ";
 
     private ArrayList<InnCoreHandler> handlers;
@@ -35,7 +35,7 @@ public class InnCoreCommand implements CommandExecutor {
         final String[] handlerArgs = (String[]) ArrayUtils.subarray(args, 1, args.length);
         final InnCoreHandler handler = getHandler(args[0]);
         if(handler != null) {
-            handler.handle(this, sender, handlerArgs);
+            handler.handle(this, sender, "inn", handlerArgs);
         } else {
             sendAllHelp(sender);
         }
@@ -43,7 +43,7 @@ public class InnCoreCommand implements CommandExecutor {
     }
 
     private void sendAllHelp(CommandSender sender) {
-        final ArrayList<String> commands = new ArrayList<String>();
+        final ArrayList<String> commands = new ArrayList<>();
         for(final InnCoreHandler handler : getHandlers()) {
             commands.addAll(handler.getCmds(sender));
         }
@@ -80,15 +80,27 @@ public class InnCoreCommand implements CommandExecutor {
         }
     }
 
-    public void sendNoPerm(final CommandSender sender) {
+    public static void sendNoPerm(final CommandSender sender) {
         MessageUtils.sendMsgPrefix(sender, PREFIX, Message.NOPERM);
     }
 
-    public void sendError(final CommandSender sender, final String error) {
+    public static void sendError(final CommandSender sender, final String error) {
         MessageUtils.sendMsgPrefix(sender, PREFIX, Message.ERRORCUSTOM, error);
     }
 
-    public void sendSuccess(final CommandSender sender, final String error) {
-        sender.sendMessage(PREFIX + ChatColor.GREEN + " " + error);
+    public static void sendSuccess(final CommandSender sender, final String error) {
+        MessageUtils.sendMsgPrefix(sender, PREFIX, Message.SUCCESSCUSTOM, error);
+    }
+
+    public static void cmdCallback(CommandSender sender, CmdResultData result) {
+        if(result != null) {
+            if(result.getResult() == CmdResult.SUCCESS) {
+                InnCoreCommand.sendSuccess(sender, result.getMessage());
+            } else if(result.getResult() == CmdResult.FAILURE) {
+                InnCoreCommand.sendError(sender, result.getMessage());
+            } else if(result.getResult() == CmdResult.NOPERM) {
+                InnCoreCommand.sendNoPerm(sender);
+            }
+        }
     }
 }

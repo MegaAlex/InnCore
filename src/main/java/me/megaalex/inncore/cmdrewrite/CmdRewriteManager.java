@@ -17,6 +17,11 @@ public class CmdRewriteManager extends Manager {
     private InnCoreCommand innCmd;
 
     @Override
+    public String getEnableConfigName() {
+        return "cmdrewrite.enabled";
+    }
+
+    @Override
     public void onEnable() {
         super.onEnable();
         InnCore plugin = InnCore.getInstance();
@@ -29,13 +34,13 @@ public class CmdRewriteManager extends Manager {
 
     private void loadRewrites() {
         FileConfiguration config = InnCore.getInstance().getConfigManager().getConfig();
-        for(String cmd : config.getConfigurationSection("cmdrewrite").getKeys(false)) {
-            String rewriteWith = config.getString("cmdrewrite." + cmd, "false");
+        for(String cmd : config.getConfigurationSection("cmdrewrite.rewrite").getKeys(false)) {
+            String rewriteWith = config.getString("cmdrewrite.rewrite." + cmd, "false");
             rewiteCmds.put(cmd.toLowerCase(), rewriteWith.toLowerCase());
         }
     }
 
-    public void processCommand(Player player, String message) {
+    public boolean processCommand(Player player, String message) {
         String[] splitMessage = message.substring(1).split(" ");
         String args[] = Arrays.copyOfRange(splitMessage, 1, splitMessage.length);
         String cmd = splitMessage[0];
@@ -44,14 +49,11 @@ public class CmdRewriteManager extends Manager {
             InnCoreHandler handler = innCmd.getHandler(handlerName);
             if(handler == null) {
                 InnCore.getInstance().getLogger().warning("Couldn't find handler with name " + handlerName + ".");
-                return;
+                return false;
             }
-            handler.handle(innCmd, player, args);
+            handler.handle(innCmd, player, cmd, args);
+            return true;
         }
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+        return false;
     }
 }

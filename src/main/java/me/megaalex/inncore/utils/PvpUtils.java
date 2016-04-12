@@ -23,7 +23,7 @@ public class PvpUtils {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard board = manager.getNewScoreboard();
         Objective topObjective = board.registerNewObjective("topKills", "dummy");
-        topObjective.setDisplayName(ChatColor.GREEN + "Nai-opasni:");
+        topObjective.setDisplayName(ChatColor.GREEN + "Most Kills:");
         topObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         for(Map.Entry<String, Integer> entry : topData.entrySet()) {

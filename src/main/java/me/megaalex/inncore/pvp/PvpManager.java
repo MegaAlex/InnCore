@@ -12,7 +12,6 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.Manager;
-import me.megaalex.inncore.database.Sql;
 import me.megaalex.inncore.pvp.scoreboard.ScoreHideTask;
 import me.megaalex.inncore.pvp.scoreboard.ScoreShowTask;
 import me.megaalex.inncore.pvp.scoreboard.ScoreUpdate;
@@ -26,20 +25,25 @@ public class PvpManager extends Manager {
 
     public Set<UUID> shownScoreboard;
 
+    private PvpSqlModule sql;
+
+    @Override
+    public String getEnableConfigName() {
+        return "pvp.enabled";
+    }
+
     public void onEnable() {
-        if(!InnCore.getInstance().getConfigManager().pvpConfig.isEnabled())
-            return;
         super.onEnable();
-        updateScoreTask = Bukkit.getScheduler().runTaskTimerAsynchronously(
-                InnCore.getInstance(), new ScoreUpdate(), 20L,
-                InnCore.getInstance().getConfigManager().pvpConfig.getScoreUpdate());
+        InnCore plugin = InnCore.getInstance();
+        sql = new PvpSqlModule();
+        plugin.getDatabaseManager().registerSqlModule(sql);
+        updateScoreTask = new ScoreUpdate().runTaskTimerAsynchronously(
+                plugin, 20L, plugin.getConfigManager().pvpConfig.getScoreUpdate());
         if(InnCore.getInstance().getConfigManager().pvpConfig.useScoreboard()) {
-            long delay = InnCore.getInstance().getConfigManager().pvpConfig.getScoreDelay();
-            showScoreTask = Bukkit.getScheduler().runTaskTimer(InnCore.getInstance(),
-                    new ScoreShowTask(), delay, delay);
+            long delay = plugin.getConfigManager().pvpConfig.getScoreDelay();
+            showScoreTask = new ScoreShowTask().runTaskTimer(plugin, delay, delay);
         }
-        Bukkit.getPluginManager().registerEvents(new EventListener(),
-                InnCore.getInstance());
+        Bukkit.getPluginManager().registerEvents(new EventListener(), plugin);
         shownScoreboard = new HashSet<>();
     }
 
@@ -52,7 +56,7 @@ public class PvpManager extends Manager {
     }
 
     public static int getKills(String player) {
-        Sql sql = InnCore.getInstance().getDatabaseManager().getSql();
+        PvpSqlModule sql = InnCore.getInstance().getPvpManager().getSql();
         return sql.getKills(player);
     }
 
@@ -61,12 +65,12 @@ public class PvpManager extends Manager {
     }
 
     public static boolean addKill(String player) {
-        Sql sql = InnCore.getInstance().getDatabaseManager().getSql();
+        PvpSqlModule sql = InnCore.getInstance().getPvpManager().getSql();
         return sql.addKills(player, 1);
     }
 
     public static boolean setKills(String player, int kills) {
-        Sql sql = InnCore.getInstance().getDatabaseManager().getSql();
+        PvpSqlModule sql = InnCore.getInstance().getPvpManager().getSql();
         return sql.setKills(player, kills);
     }
 
@@ -109,4 +113,15 @@ public class PvpManager extends Manager {
         }
     }
 
+    public BukkitTask getUpdateScoreTask() {
+        return updateScoreTask;
+    }
+
+    public BukkitTask getShowScoreTask() {
+        return showScoreTask;
+    }
+
+    public PvpSqlModule getSql() {
+        return sql;
+    }
 }

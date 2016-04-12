@@ -1,8 +1,7 @@
 name: InnCore
-version: 1.2
+version: 1.3
 main: me.megaalex.inncore.InnCore
-depend: [WorldEdit, Vault]
-softdepend: [Citizens]
+softdepend: [Citizens, HolographicDisplays, WorldGuard, WorldEdit, Vault, Herochat, ASkyBlock]
 commands:
     inn:
         description: InnCraft main core command

@@ -14,10 +14,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import com.dthielke.herochat.ChannelChatEvent;
-import com.dthielke.herochat.ChatCompleteEvent;
-import com.dthielke.herochat.Chatter;
-import com.dthielke.herochat.Herochat;
+import com.dthielke.Herochat;
+import com.dthielke.MessageHandler;
+import com.dthielke.api.ChatResult;
+import com.dthielke.api.event.ChannelChatEvent;
+import com.dthielke.api.event.ChatCompleteEvent;
 import net.md_5.bungee.api.ChatColor;
 
 public class TeamChatListener implements Listener {
@@ -32,7 +33,7 @@ public class TeamChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChannelChat(ChannelChatEvent e) {
-        Player player = e.getSender().getPlayer();
+        Player player = e.getChatter().getPlayer();
         int islandLvl = manager.getPlayerIslandLevel(player.getUniqueId());
         e.setFormat(e.getFormat().replace("{ISLAND_LEVEL}", String.valueOf(islandLvl)));
 
@@ -45,11 +46,12 @@ public class TeamChatListener implements Listener {
             if(player.isOnline()) {
                 player.sendMessage(ChatColor.RED + "You are not in a team!");
             }
-            e.setResult(Chatter.Result.FAIL);
+            e.setResult(ChatResult.FAIL);
             return;
         }
-        String format = e.getChannel().applyFormat(e.getFormat(), e.getBukkitFormat(), player);
-        String msg = String.format(format, player.getDisplayName(), e.getMessage());
+        String msg = MessageHandler.getInstance().formatMessage(e.getChannel(), player, e.getFormat(), e.getMessage());
+        //String format = e.getChannel().applyFormat(e.getFormat(), e.getBukkitFormat(), player);
+        //String msg = String.format(format, player.getDisplayName(), e.getMessage());
         for (UUID recipientId : recipients) {
             Player recipient = Bukkit.getPlayer(recipientId);
             if(recipient == null || !recipient.isOnline()) {
@@ -64,8 +66,9 @@ public class TeamChatListener implements Listener {
             }
         }
 
-        Bukkit.getPluginManager().callEvent(new ChatCompleteEvent(e.getSender(), e.getChannel(), msg));
+        Bukkit.getPluginManager().callEvent(new ChatCompleteEvent(e.getChatter(), e.getChannel(),
+                msg, e.getCost(), e.isAsynchronous()));
         Herochat.logChat(msg);
-        e.setResult(Chatter.Result.FAIL);
+        e.setResult(ChatResult.FAIL);
     }
 }

@@ -12,6 +12,7 @@ public class FactionsMiscManager extends Manager {
     }
 
     private boolean hasWorldGuard;
+    private MiningLevelManagerListener miningManager;
 
     @Override
     public void onEnable() {
@@ -24,9 +25,19 @@ public class FactionsMiscManager extends Manager {
         plugin.getServer().getPluginManager().registerEvents(new FactionMiscListener(config, this), plugin);
 
         hasWorldGuard = (plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard"));
+
+        if(config.enableMiningDivide) {
+            miningManager = new MiningLevelManagerListener(config);
+            plugin.getServer().getPluginManager().registerEvents(miningManager, plugin);
+        }
     }
+
 
     public boolean hasWorldGuard() {
         return hasWorldGuard;
+    }
+
+    public MiningLevelManagerListener getMiningManager() {
+        return miningManager;
     }
 }

@@ -30,6 +30,7 @@ public class InnCoreCommand implements CommandExecutor {
             return false;
         }
         if(args.length == 0) {
+            sendAllHelp(sender);
             return true;
         }
         final String[] handlerArgs = (String[]) ArrayUtils.subarray(args, 1, args.length);

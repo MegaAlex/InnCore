@@ -41,7 +41,7 @@
         <dependency>
             <groupId>other.plugins</groupId>
             <artifactId>Citizens</artifactId>
-            <version>2.0.16-SNAPSHOT</version>
+            <version>2.0.18-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
@@ -56,17 +56,37 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>6.0.0-SNAPSHOT</version>
+            <version>6.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.dthielke</groupId>
             <artifactId>herochat</artifactId>
-            <version>5.7.0</version>
+            <version>legacy</version>
         </dependency>
         <dependency>
             <groupId>com.wasteofplastic</groupId>
             <artifactId>ASkyBlock</artifactId>
             <version>2.9.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>MaxBans</groupId>
+            <artifactId>MaxBans</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>other.plugins</groupId>
+            <artifactId>Votifier</artifactId>
+            <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>me.megaalex</groupId>
+            <artifactId>InnMerchant</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
     <build>

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.megaalex.inncore.bungee.BungeeManager;
 import me.megaalex.inncore.chatsync.ChatSyncManager;
 import me.megaalex.inncore.cmdrewrite.CmdRewriteManager;
 import me.megaalex.inncore.command.CommandManager;
@@ -15,10 +16,13 @@ import me.megaalex.inncore.data.DataManager;
 import me.megaalex.inncore.database.DatabaseManager;
 import me.megaalex.inncore.factionsmisc.FactionsMiscManager;
 import me.megaalex.inncore.misc.MiscManager;
+import me.megaalex.inncore.misc.maxbans.MaxbansManager;
 import me.megaalex.inncore.news.NewsManager;
 import me.megaalex.inncore.npc.NpcManager;
 import me.megaalex.inncore.pvp.PvpManager;
 import me.megaalex.inncore.sky.SkyBlockManager;
+import me.megaalex.inncore.towns.TownsManager;
+import me.megaalex.inncore.votes.VotesManager;
 
 public class InnCore extends JavaPlugin {
 
@@ -38,6 +42,10 @@ public class InnCore extends JavaPlugin {
     private NewsManager newsManager;
     private MiscManager miscManager;
     private SkyBlockManager skyBlockManager;
+    private MaxbansManager maxbansManager;
+    private TownsManager townsManager;
+    private VotesManager votesManager;
+    private BungeeManager bungeeManager;
 
     private List<Manager> managerList;
 
@@ -68,6 +76,10 @@ public class InnCore extends JavaPlugin {
         newsManager = new NewsManager();
         miscManager = new MiscManager();
         skyBlockManager = new SkyBlockManager();
+        maxbansManager = new MaxbansManager();
+        townsManager = new TownsManager();
+        votesManager = new VotesManager();
+        bungeeManager = new BungeeManager();
 
         managerList.add(configManager);
         managerList.add(dataManager);
@@ -82,6 +94,10 @@ public class InnCore extends JavaPlugin {
         managerList.add(newsManager);
         managerList.add(miscManager);
         managerList.add(skyBlockManager);
+        managerList.add(maxbansManager);
+        managerList.add(townsManager);
+        managerList.add(votesManager);
+        managerList.add(bungeeManager);
 
         managerList.add(cmdRewriteManager);
 
@@ -175,5 +191,21 @@ public class InnCore extends JavaPlugin {
 
     public SkyBlockManager getSkyBlockManager() {
         return skyBlockManager;
+    }
+
+    public MaxbansManager getMaxbansManager() {
+        return maxbansManager;
+    }
+
+    public TownsManager getTownsManager() {
+        return townsManager;
+    }
+
+    public BungeeManager getBungeeManager() {
+        return bungeeManager;
+    }
+
+    public FactionsMiscManager getFactionsMiscManager() {
+        return factionsMiscManager;
     }
 }

@@ -21,6 +21,8 @@ public class ConfigManager extends Manager {
     private NpcConfig npcConfig;
     private MiscConfig miscConfig;
     private SkyBlockConfig skyConfig;
+    private TownsConfig townsConfig;
+    private VoteConfig voteConfig;
     private List<SubConfig> subConfigList;
 
 
@@ -38,6 +40,8 @@ public class ConfigManager extends Manager {
         npcConfig = new NpcConfig();
         miscConfig = new MiscConfig();
         skyConfig = new SkyBlockConfig();
+        townsConfig = new TownsConfig();
+        voteConfig = new VoteConfig();
 
 
         subConfigList = new ArrayList<>();
@@ -48,6 +52,8 @@ public class ConfigManager extends Manager {
         subConfigList.add(npcConfig);
         subConfigList.add(miscConfig);
         subConfigList.add(skyConfig);
+        subConfigList.add(townsConfig);
+        subConfigList.add(voteConfig);
         loadConfig();
     }
 
@@ -147,4 +153,11 @@ public class ConfigManager extends Manager {
         return skyConfig;
     }
 
+    public TownsConfig getTownsConfig() {
+        return townsConfig;
+    }
+
+    public VoteConfig getVoteConfig() {
+        return voteConfig;
+    }
 }

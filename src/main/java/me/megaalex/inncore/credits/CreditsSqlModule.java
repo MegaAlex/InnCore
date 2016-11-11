@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,23 +46,7 @@ public class CreditsSqlModule extends SqlModule {
                 "  PRIMARY KEY (`id`)" +
                 ") ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;";
 
-        Statement stmt = null;
-        try {
-            stmt = con.con.createStatement();
-            stmt.addBatch(creditsTable);
-            stmt.addBatch(transactionTable);
-            stmt.executeBatch();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        executeBatchQuiet(con, creditsTable, transactionTable);
         closeConnection(con);
     }
 

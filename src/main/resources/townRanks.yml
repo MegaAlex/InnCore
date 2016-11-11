@@ -1,0 +1,12 @@
+1:
+  name: Official town
+  minPlayers: 1
+  maxPlayers: 1
+2:
+  name: Village
+  minPlayers: 1
+  maxPlayers: 3
+3:
+  name: City
+  minPlayers: 3
+  maxPlayers: -1

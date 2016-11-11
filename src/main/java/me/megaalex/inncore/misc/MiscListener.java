@@ -36,8 +36,8 @@ public class MiscListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
+        final Player player = e.getPlayer();
         if(config.tpOnJoin()) {
-            final Player player = e.getPlayer();
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -45,11 +45,20 @@ public class MiscListener implements Listener {
                 }
             }.runTask(InnCore.getInstance());
         }
+
+        if(config.disableCollision()) {
+            InnCore.getInstance().getMiscManager().addPlayerToCollisionTeam(player);
+            player.setCollidable(false);
+        }
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
+
+        if(config.disableCollision()) {
+            InnCore.getInstance().getMiscManager().removePlayerFromCollisionTeam(e.getPlayer());
+        }
     }
 
     @EventHandler

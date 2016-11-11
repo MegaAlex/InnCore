@@ -3,10 +3,13 @@ package me.megaalex.inncore.credits;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.megaalex.inncore.messages.Message;
 import me.megaalex.inncore.utils.PlayerUtils;
+import me.megaalex.inncore.utils.UUIDUtils;
 
 public class ChangeTask extends BukkitRunnable {
 
@@ -33,6 +36,7 @@ public class ChangeTask extends BukkitRunnable {
     private String executorName;
     private String receiverName;
 
+    private OfflinePlayer receiverPlayer;
 
     private BigDecimal creditsChange;
 
@@ -57,6 +61,8 @@ public class ChangeTask extends BukkitRunnable {
         this.receiverName = receiverName;
 
         this.creditsChange = creditsChange;
+
+        this.receiverPlayer = Bukkit.getOfflinePlayer(UUIDUtils.getPlayerId(receiverName));
     }
 
 
@@ -66,6 +72,12 @@ public class ChangeTask extends BukkitRunnable {
         if(this.creditsChange.compareTo(BigDecimal.ZERO) <= 0) {
             PlayerUtils.sendMessage(executorId,
                     Message.NEGATIVE_ARG);
+            return;
+        }
+
+        if(!this.receiverPlayer.hasPlayedBefore()) {
+            PlayerUtils.sendMessage(executorId,
+                    Message.ERRORCUSTOM, "Unknown player!");
             return;
         }
 

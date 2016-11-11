@@ -12,6 +12,7 @@ import me.megaalex.inncore.command.handlers.NpcHandler;
 import me.megaalex.inncore.command.handlers.PvpHandler;
 import me.megaalex.inncore.command.handlers.StaffNpcHandler;
 import me.megaalex.inncore.command.handlers.utils.GbroadcastHandler;
+import me.megaalex.inncore.command.handlers.MiningHandler;
 import me.megaalex.inncore.command.handlers.utils.ServerHandler;
 import me.megaalex.inncore.command.handlers.utils.ServerTpHandler;
 import me.megaalex.inncore.command.handlers.utils.SetSpawnHandler;
@@ -68,6 +69,9 @@ public class CommandManager extends Manager {
         }
         if(enabledCommands.contains("setspawn")) {
             handlers.add(new SetSpawnHandler());
+        }
+        if(enabledCommands.contains("mining")) {
+            handlers.add(new MiningHandler());
         }
 
 

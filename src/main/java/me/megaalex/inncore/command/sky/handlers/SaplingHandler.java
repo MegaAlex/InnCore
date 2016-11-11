@@ -13,9 +13,10 @@ import org.bukkit.TreeSpecies;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Tree;
+import org.bukkit.material.Sapling;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.command.InnCoreCommand;
 import me.megaalex.inncore.command.handlers.InnCoreHandler;
 
@@ -45,8 +46,8 @@ public class SaplingHandler implements InnCoreHandler {
         String type = args[0];
         TreeSpecies species = getSpecies(type);
 
-        Player player = (Player) sender;
-        ItemStack handItem = player.getItemInHand();
+        final Player player = (Player) sender;
+        final ItemStack handItem = player.getInventory().getItemInMainHand().clone();
         if(handItem.getType() != Material.SAPLING) {
             InnCoreCommand.sendError(sender, "Hold a sapling before using this command!");
             return;
@@ -55,22 +56,22 @@ public class SaplingHandler implements InnCoreHandler {
             InnCoreCommand.sendError(sender, "Unknown tree type, valid types: " + getTreeTypeList());
             return;
         }
-        MaterialData data = handItem.getData();
-        Tree test = new Tree(Material.SAPLING);
-        if(data.getData() == species.getData()) {
+        Sapling sapling = (Sapling) handItem.getData();
+        if(sapling.getSpecies() == species) {
             InnCoreCommand.sendError(sender, "This is the same type of sapling!");
             return;
         }
-        Tree treeData = new Tree(Material.SAPLING);
-        treeData.setSpecies(species);
-        ///tphandItem.setData(treeData);
-        ItemStack newItemStack = handItem.clone();
-        newItemStack.setData(treeData);
-        player.setItemInHand(newItemStack);
-        //data.setData(species.getData());
-        //handItem.setData(data);
-        //player.setItemInHand(handItem);
-        player.updateInventory();
+        sapling.setSpecies(species);
+        handItem.setDurability(sapling.getData());
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                player.getInventory().setItemInMainHand(handItem);
+            }
+        }.runTask(InnCore.getInstance());
+
+        //player.updateInventory();
         InnCoreCommand.sendSuccess(sender, "Successfully changed sapling type!");
 
     }

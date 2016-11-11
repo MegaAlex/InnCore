@@ -56,10 +56,17 @@ public class SkyBlockManager extends Manager {
 
     public int getPlayerIslandLevel(UUID playerId) {
         ASkyBlockAPI sbApi = ASkyBlockAPI.getInstance();
-        if(sbApi != null && sbApi.hasIsland(playerId)) {
-            return sbApi.getIslandLevel(playerId);
+        if(sbApi == null) {
+            return 0;
         }
-        return 0;
+
+        if(sbApi.inTeam(playerId)) {
+            UUID newId = sbApi.getTeamLeader(playerId);
+            if(newId != null) {
+                playerId = newId;
+            }
+        }
+        return sbApi.hasIsland(playerId) ? sbApi.getIslandLevel(playerId) : 0;
     }
 
     public SkyBlockConfig getConfig() {

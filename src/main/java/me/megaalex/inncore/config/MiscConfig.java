@@ -22,6 +22,9 @@ public class MiscConfig implements SubConfig {
     private List<String> fallWorlds;
     private boolean tpOnJoin;
 
+    private boolean disableCollision;
+    private String collisonType;
+
     @Override
     public void loadConfig(ConfigurationSection config) {
         colorSigns = config.getBoolean("color.sign", true);
@@ -34,6 +37,8 @@ public class MiscConfig implements SubConfig {
         fallWorlds = config.getStringList("spawn.worlds");
         tpOnJoin = config.getBoolean("spawn.tpOnJoin", false);
 
+        disableCollision = config.getBoolean("disablePlayerColission", false);
+        collisonType = config.getString("collisionType", "FOR_OWN_TEAM");
     }
 
     @Override
@@ -63,5 +68,13 @@ public class MiscConfig implements SubConfig {
 
     public boolean tpOnJoin() {
         return tpOnJoin;
+    }
+
+    public boolean disableCollision() {
+        return disableCollision;
+    }
+
+    public String getCollisonType() {
+        return collisonType;
     }
 }

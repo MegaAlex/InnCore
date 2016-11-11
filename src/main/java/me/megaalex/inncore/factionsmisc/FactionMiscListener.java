@@ -22,13 +22,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Openable;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -47,6 +52,7 @@ import me.megaalex.inncore.config.FactionMiscConfig;
 import me.megaalex.inncore.messages.Message;
 import me.megaalex.inncore.messages.MessageUtils;
 import me.megaalex.inncore.utils.PlayerUtils;
+import me.megaalex.innmerchant.util.InvUtils;
 
 public class FactionMiscListener implements Listener {
 
@@ -113,14 +119,15 @@ public class FactionMiscListener implements Listener {
             }
         }
 
-        if(config.disableWorldMining && e.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world")) {
+        if(config.disableWorldMining && e.getBlock().getLocation().getWorld().getName().equalsIgnoreCase(config.mainWorldName)) {
             Material type = e.getBlock().getType();
             if(type == Material.IRON_ORE || type == Material.COAL_ORE
                     || type == Material.GOLD_ORE || type == Material.REDSTONE_ORE
                     || type == Material.GLOWING_REDSTONE_ORE || type == Material.DIAMOND_ORE
-                    || type == Material.EMERALD_ORE || type == Material.LAPIS_ORE) {
-                e.getPlayer().sendMessage(ChatColor.RED+"Please mine ores in the mining world only! "
-                        +  "Portal to that world is located at spawn.");
+                    || type == Material.EMERALD_ORE || type == Material.LAPIS_ORE || type == Material.SAND) {
+                String block = type == Material.SAND ? "pqsuk" : "rudi";
+                e.getPlayer().sendMessage(ChatColor.RED + "Molq kopite " + block + " samo v mining sveta!"
+                        +  ChatColor.GOLD + "/mining" + ChatColor.RED + " za da otidete do nego!");
                 e.setCancelled(true);
                 e.getBlock().setType(Material.AIR);
             }
@@ -193,17 +200,98 @@ public class FactionMiscListener implements Listener {
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onMobKill(EntityDeathEvent e) {
         if(!config.nerfXP) {
             return;
         }
 
-        int xpDrop = e.getDroppedExp() / 2;
+        e.setDroppedExp(getNerfedExp(e.getDroppedExp()));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMinedOre(BlockBreakEvent e) {
+        if(!config.nerfXP) {
+            return;
+        }
+
+        e.setExpToDrop(getNerfedExp(e.getExpToDrop()));
+    }*/
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerExpPickup(PlayerExpChangeEvent e) {
+        if(e.getAmount() <= 0) {
+            return;
+        }
+        if(!config.nerfXP) {
+            return;
+        }
+
+        e.setAmount(getNerfedExp(e.getAmount()));
+    }
+
+    private int getNerfedExp(int xp) {
+        int xpDrop = xp/ 2;
         if(xpDrop == 0) {
             xpDrop++;
         }
+        return xpDrop;
+    }
 
-        e.setDroppedExp(xpDrop);
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onInvOpen(InventoryOpenEvent e) {
+
+        boolean updated = processInventory(e.getView().getBottomInventory());
+        if(!InvUtils.isValidInventory(e.getView().getTopInventory())) {
+            updated = updated | processInventory(e.getView().getTopInventory());
+        }
+        if(updated) {
+            ((Player) e.getPlayer()).updateInventory();
+            System.out.println("[CIS] " + e.getPlayer().getName() + " opened a inv with cheated items!");
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        if(!config.removeCheatedItems) {
+            return;
+        }
+        boolean updatedInv = processInventory(e.getPlayer().getInventory());
+        if(updatedInv) {
+            System.out.println("[CIS] " + e.getPlayer().getName() + " had cheated items in his inventory!");
+            e.getPlayer().updateInventory();
+        }
+        boolean updatedEnder = processInventory(e.getPlayer().getEnderChest());
+        if(updatedEnder) {
+            System.out.println("[CIS] " + e.getPlayer().getName() + " had cheated items in his ender chest!");
+        }
+    }
+
+    private boolean processInventory(Inventory inv) {
+        boolean updated = false;
+        for (ItemStack is : inv) {
+            if (isCheated(is)) {
+                System.out.println("[CIS] " + "Removed " + is.getAmount() + " of " + is.getType().name() + ".");
+                inv.remove(is);
+                updated = true;
+            }
+        }
+        return updated;
+    }
+
+
+    private boolean isCheated(ItemStack is) {
+        if(is == null || is.getType() == Material.AIR) {
+            return false;
+        }
+        ItemMeta meta = is.getItemMeta();
+        if(meta == null || !meta.hasLore() || meta.getLore() == null) {
+            return false;
+        }
+        for(String loreLine : meta.getLore()) {
+            if(loreLine.contains("item(s)") || loreLine.contains("quantity"))
+                return true;
+        }
+        return false;
     }
 }

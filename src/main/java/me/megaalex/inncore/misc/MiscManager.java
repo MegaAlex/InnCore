@@ -11,6 +11,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.Manager;
@@ -25,6 +27,8 @@ public class MiscManager extends Manager {
     private CustomDataFile miscDataFile;
     private Location spawnLocation;
 
+    private Scoreboard collisionScoreboard;
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -36,6 +40,20 @@ public class MiscManager extends Manager {
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "InnCraft");
 
         spawnLocation = loadSpawnLocation();
+
+        if(config.disableCollision()) {
+            collisionScoreboard = plugin.getServer().getScoreboardManager().getMainScoreboard();
+            Team colTeam = collisionScoreboard.getTeam("collision");
+            if(colTeam == null) colTeam = collisionScoreboard.registerNewTeam("collision");
+            Team.OptionStatus status;
+            try {
+                status = Team.OptionStatus.valueOf(config.getCollisonType().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                Bukkit.getLogger().warning("Invalid collision type!");
+                status = Team.OptionStatus.FOR_OWN_TEAM;
+            }
+            colTeam.setOption(Team.Option.COLLISION_RULE, status);
+        }
     }
 
     public void handleServerCommand(Player player, String serverName) {
@@ -93,5 +111,19 @@ public class MiscManager extends Manager {
 
     public MiscConfig getConfig() {
         return config;
+    }
+
+    public void addPlayerToCollisionTeam(Player player) {
+        if(collisionScoreboard == null || collisionScoreboard.getTeam("collision") == null) {
+            return;
+        }
+        collisionScoreboard.getTeam("collision").addEntry(player.getName());
+    }
+
+    public void removePlayerFromCollisionTeam(Player player) {
+        if(collisionScoreboard == null || collisionScoreboard.getTeam("collision") == null) {
+            return;
+        }
+        collisionScoreboard.getTeam("collision").removeEntry(player.getName());
     }
 }

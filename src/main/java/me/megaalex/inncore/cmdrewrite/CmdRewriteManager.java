@@ -1,8 +1,14 @@
 package me.megaalex.inncore.cmdrewrite;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -40,7 +46,7 @@ public class CmdRewriteManager extends Manager {
         }
     }
 
-    public boolean processCommand(Player player, String message) {
+    public boolean processCommand(CommandSender sender, String message) {
         String[] splitMessage = message.substring(1).split(" ");
         String args[] = Arrays.copyOfRange(splitMessage, 1, splitMessage.length);
         String cmd = splitMessage[0];
@@ -51,9 +57,30 @@ public class CmdRewriteManager extends Manager {
                 InnCore.getInstance().getLogger().warning("Couldn't find handler with name " + handlerName + ".");
                 return false;
             }
-            handler.handle(innCmd, player, cmd, args);
+            handler.handle(innCmd, sender, cmd, args);
             return true;
         }
         return false;
+    }
+
+    public void processTabCompete(String message, Collection<String> tabCompletions) {
+        if(!message.startsWith("/")) {
+            return;
+        }
+        String cmd = message.substring(1).split(" ")[0];
+        for(Map.Entry<String, String> entry : rewiteCmds.entrySet()) {
+            if(cmd.equalsIgnoreCase(entry.getKey())) {
+                tabCompletions.addAll(getPlayerNames());
+                break;
+            }
+        }
+    }
+
+    public List<String> getPlayerNames() {
+        ArrayList<String> players = new ArrayList<>();
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            players.add(player.getName());
+        }
+        return players;
     }
 }

@@ -35,4 +35,16 @@ public class PluginMsgUtils {
             e.printStackTrace();
         }
     }
+
+    public static void executeBungeeCommand(String command) {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(b);
+        try {
+            out.writeUTF("exec");
+            out.writeUTF(command);
+            Bukkit.getOnlinePlayers().iterator().next().sendPluginMessage(InnCore.getInstance(), "InnCraft", b.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

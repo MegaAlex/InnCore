@@ -1,16 +1,10 @@
 package me.megaalex.inncore.cmdrewrite;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 import me.megaalex.inncore.InnCore;
 import me.megaalex.inncore.Manager;
@@ -61,26 +55,5 @@ public class CmdRewriteManager extends Manager {
             return true;
         }
         return false;
-    }
-
-    public void processTabCompete(String message, Collection<String> tabCompletions) {
-        if(!message.startsWith("/")) {
-            return;
-        }
-        String cmd = message.substring(1).split(" ")[0];
-        for(Map.Entry<String, String> entry : rewiteCmds.entrySet()) {
-            if(cmd.equalsIgnoreCase(entry.getKey())) {
-                tabCompletions.addAll(getPlayerNames());
-                break;
-            }
-        }
-    }
-
-    public List<String> getPlayerNames() {
-        ArrayList<String> players = new ArrayList<>();
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            players.add(player.getName());
-        }
-        return players;
     }
 }

@@ -208,4 +208,8 @@ public class InnCore extends JavaPlugin {
     public FactionsMiscManager getFactionsMiscManager() {
         return factionsMiscManager;
     }
+
+    public VotesManager getVotesManager() {
+        return votesManager;
+    }
 }

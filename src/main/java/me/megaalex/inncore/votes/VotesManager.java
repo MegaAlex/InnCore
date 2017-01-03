@@ -19,6 +19,7 @@ import me.megaalex.inncore.config.VoteConfig;
 public class VotesManager extends Manager {
 
     VotesSqlModule sqlModule;
+    StartCheckTask startCheckTask;
 
     @Override
     public void onEnable() {
@@ -30,11 +31,15 @@ public class VotesManager extends Manager {
             return;
         }
 
+        InnCore plugin = InnCore.getInstance();
         sqlModule = new VotesSqlModule();
         InnCore.getInstance().getDatabaseManager().registerSqlModule(sqlModule);
-        Bukkit.getPluginManager().registerEvents(new VotesListner(this), InnCore.getInstance());
+        Bukkit.getPluginManager().registerEvents(new VotesListner(this), plugin);
 
-        new VoteExpiryCheckTask(this).runTaskTimerAsynchronously(InnCore.getInstance(), 600L, 600L);
+        new VoteExpiryCheckTask(this).runTaskTimerAsynchronously(plugin, 600L, 600L);
+
+        startCheckTask = new StartCheckTask();
+        startCheckTask.runTaskTimerAsynchronously(plugin, 600L, 600L);
     }
 
     @Override
@@ -43,8 +48,7 @@ public class VotesManager extends Manager {
     }
 
     public void onVote(final Vote vote) {
-        final InnCore plugin = InnCore.getInstance();
-        final List<String> services = plugin.getConfigManager().getVoteConfig().services;
+        final List<String> services = getServices();
         if(!services.contains(vote.getServiceName())) {
             Bukkit.getLogger().warning("Vote from unknown service relieved! Ignoring.");
             return;
@@ -52,18 +56,13 @@ public class VotesManager extends Manager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                List<String> activeVotes = sqlModule.getActivePlayerVoteServices(vote.getUsername());
-                if(!activeVotes.contains(vote.getServiceName())) {
-                    if(activeVotes.size() + 1 == services.size()) {
-                        runStartCmdTask(vote.getUsername());
-                    }
-                    sqlModule.addVote(new PlayerVote(vote.getUsername(), vote.getServiceName()));
-                }
+                sqlModule.addVote(new PlayerVote(vote.getUsername(), vote.getServiceName()));
+                startCheckTask.addVote(vote.getUsername());
             }
         }.runTaskAsynchronously(InnCore.getInstance());
     }
 
-    private void runStartCmdTask(final String username) {
+    protected void runStartCmdTask(final String username) {
         VoteConfig voteConfig = InnCore.getInstance().getConfigManager().getVoteConfig();
         runCmds(username, voteConfig.startCmd);
         if(!voteConfig.bungeeStartCmd.isEmpty())
@@ -99,5 +98,14 @@ public class VotesManager extends Manager {
             cmd = cmd.replaceAll("\\{player\\}", username);
             manager.executeRemoteCmd(cmd);
         }
+    }
+
+    protected int getServicesSize() {
+        return getServices().size();
+    }
+
+    private List<String> getServices() {
+        final InnCore plugin = InnCore.getInstance();
+        return plugin.getConfigManager().getVoteConfig().services;
     }
 }

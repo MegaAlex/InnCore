@@ -3,7 +3,6 @@ package me.megaalex.inncore.cmdrewrite;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
@@ -23,10 +22,5 @@ public class CmdRewriteListener implements Listener {
         if(InnCore.getInstance().getCmdRewriteManager().processCommand(e.getSender(), e.getCommand())) {
             e.setCancelled(true);
         }
-    }
-
-    @EventHandler
-    public void onTabComplete(PlayerChatTabCompleteEvent e) {
-        InnCore.getInstance().getCmdRewriteManager().processTabCompete(e.getChatMessage(), e.getTabCompletions());
     }
 }

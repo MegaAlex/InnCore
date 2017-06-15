@@ -109,16 +109,21 @@ public class TownsDataManager {
         }.runTaskAsynchronously(InnCore.getInstance());
     }
 
-    public void setMayor(Town town, String mayor) {
+    public void setMayor(final Town town, String mayor) {
         if(town.isDeputy(mayor)) {
             removeDeputy(town, mayor);
         } else if(town.isMember(mayor)) {
             removeMember(town, mayor);
         }
-        addMember(town, town.getMayor());
         town.setMayor(mayor);
+        addMember(town, town.getMayor());
         setPlayerTown(mayor, town);
-        saveTown(town);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                saveTown(town);
+            }
+        }.runTaskLater(InnCore.getInstance(), 40L);
     }
 
     public void setName(Town town, String name) {

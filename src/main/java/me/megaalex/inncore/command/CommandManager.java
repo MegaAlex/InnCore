@@ -9,6 +9,7 @@ import me.megaalex.inncore.command.handlers.CreditsHandler;
 import me.megaalex.inncore.command.handlers.InnCoreHandler;
 import me.megaalex.inncore.command.handlers.NewsHandler;
 import me.megaalex.inncore.command.handlers.NpcHandler;
+import me.megaalex.inncore.command.handlers.PaperHandler;
 import me.megaalex.inncore.command.handlers.PvpHandler;
 import me.megaalex.inncore.command.handlers.StaffNpcHandler;
 import me.megaalex.inncore.command.handlers.utils.GbroadcastHandler;
@@ -72,6 +73,9 @@ public class CommandManager extends Manager {
         }
         if(enabledCommands.contains("mining")) {
             handlers.add(new MiningHandler());
+        }
+        if(enabledCommands.contains("paper")) {
+            handlers.add(new PaperHandler());
         }
 
 

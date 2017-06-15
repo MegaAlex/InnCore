@@ -129,4 +129,7 @@ vote:
   bungeeEndCmd: []
 bungee:
   enabled: false
-
+paper:
+  enabled: true
+discord:
+  enabled: false
